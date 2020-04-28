@@ -10,9 +10,14 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@eva-design/eva": "^1.4.0",
+    "@ui-kitten/components": "^4.4.1",
+    "galio-framework": "^0.6.3",
     "react": "16.11.0",
     "react-native": "0.62.2",
-    "react-native-ble-plx": "^2.0.0"
+    "react-native-ble-plx": "^2.0.0",
+    "react-native-svg": "^12.1.0",
+    "react-native-vector-icons": "^6.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
