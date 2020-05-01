@@ -1,86 +1,56 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
-import { StyleSheet, View } from 'react-native';
-
-import { Text } from 'galio-framework';
-
-import { BleManager } from 'react-native-ble-plx';
+import {
+  PermissionsAndroid,
+  Platform,
+  View,
+  Text
+} from 'react-native'
 
 export default class Tracer extends Component {
   constructor() {
     super()
-    this.manager = new BleManager()
     this.state = {
-      info: '',
-      values: {},
-      devices: []
+      isScanning: false,
+      isBleEnabled: false,
+      isLocationEnabled: false,
+      peripherals: new Map(),
+      appState: ''
     }
   }
 
-  info(message) {
-    this.setState({ info: message })
-  }
-
-  error(message) {
-    this.setState({ info: 'ERR: ' + message })
-  }
-
   componentWillMount() {
-    this.scanDevices()
+    this.checkLocationPermissions()
   }
 
-  async scanDevices() {
-    this.manager.startDeviceScan(null, null, (error, device) => {
-      if (error) {
-        // error summary
-        switch (error.errorCode) {
-          case 102:
-            return this.info('Bluetooth is powered off')
-          case 101:
-            return this.info('App is unauthorized to use BLE')
-          case 100:
-            return this.info('Device does not have BLE support')
-        }
+  /* Get Location Permissions */
+  async checkLocationPermissions() {
+    if (Platform.OS === 'android') {
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION)
+        .then((result) => result ? this.setState({ isLocationEnabled: true }) : this.requestLocationPermissions())
+    }
+  }
 
-        // report error on console
-        console.log(JSON.stringify(error))
-        return
+  async requestLocationPermissions() {
+    try {
+      const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION)
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState({ isLocationEnabled: true })
+        console.log('OK 2')
+      } else {
+        console.log('Denied')
       }
-
-      // display detections on console
-      this.info('Scanning for Devices...')
-      console.log(`${device.id} : ${device.rssi}`)
-
-      // save detections on state
-      let detection = this.state.devices.concat({
-        deviceId: device.id,
-        deviceRssi: device.rssi
-      })
-      this.setState({ devices: detection })
-
-      // display all detections on console
-      console.log(...this.state.devices)
-    })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   render() {
     return (
       <View>
-        <Text style={styles.results}>
-          {this.state.info}
-        </Text>
+        <Text></Text>
       </View>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#222'
-  },
-  results: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 18
-  }
-})
