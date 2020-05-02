@@ -23,4 +23,16 @@ class TracerModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "TracerModule";
     }
+
+    // Check for BLE Support
+    @ReactMethod
+    public void checkBleSupport(Callback callback) {
+        boolean bleSupported = true;
+
+        if(!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            bleSupported = false;
+        }
+
+        callback.invoke(bleSupported);
+    }
 }
